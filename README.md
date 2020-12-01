@@ -22,6 +22,6 @@ In your eslint config file:
 
 ## Rules
 
-### `avoid-injections`
+### `knex/avoid-injections`
 
 Avoid some of the more obvious issues when it comes to SQL injection. This rule disallows any kind of interpolated string as the first argument to `.raw()`, `.whereRaw`, and `.joinRaw`.

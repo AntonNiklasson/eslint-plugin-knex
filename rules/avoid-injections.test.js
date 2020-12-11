@@ -1,13 +1,13 @@
-const { RuleTester } = require("eslint")
-const rule = require("./avoid-injections")
+const { RuleTester } = require("eslint");
+const rule = require("./avoid-injections");
 
-const ruleTester = new RuleTester({ parserOptions: { ecmaVersion: 2015 } })
+const ruleTester = new RuleTester({ parserOptions: { ecmaVersion: 2015 } });
 
 function invalidCase(code, errorIds = []) {
   return {
     code,
     errors: errorIds.map((id) => ({ messageId: id })),
-  }
+  };
 }
 
 ruleTester.run("avoid-injections", rule, {
@@ -42,4 +42,4 @@ ruleTester.run("avoid-injections", rule, {
       ["avoid-joinraw"],
     ),
   ],
-})
+});

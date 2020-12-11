@@ -22,7 +22,6 @@
     "prettier": "^2.2.1"
   },
   "prettier": {
-    "semi": false,
     "trailingComma": "all"
   }
 }

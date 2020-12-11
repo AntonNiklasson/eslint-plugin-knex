@@ -12,20 +12,20 @@ module.exports = {
   },
 
   create(context) {
-    const rawStatements = /(raw|whereRaw|joinRaw)/
+    const rawStatements = /(raw|whereRaw|joinRaw)/;
 
     return {
       [`CallExpression[callee.property.name=${rawStatements}][arguments.0.type!='Literal']`](
         node,
       ) {
-        check(context, node)
+        check(context, node);
       },
-    }
+    };
   },
-}
+};
 
 function check(context, node) {
-  const statement = node.callee.property.name
+  const statement = node.callee.property.name;
   const messageId =
     statement === "raw"
       ? "avoid-raw"
@@ -33,32 +33,32 @@ function check(context, node) {
       ? "avoid-whereraw"
       : statement === "joinRaw"
       ? "avoid-joinraw"
-      : null
-  const queryNode = node.arguments[0]
+      : null;
+  const queryNode = node.arguments[0];
 
   if (
     queryNode.type === "TemplateLiteral" &&
     queryNode.expressions.length === 0
   ) {
-    return
+    return;
   }
 
   if (queryNode.type === "Identifier") {
     const queryVariableDefinition = context
       .getScope(queryNode)
-      .variables.find((v) => v.name === queryNode.name).defs[0].node
+      .variables.find((v) => v.name === queryNode.name).defs[0].node;
 
     if (
       queryVariableDefinition.init.type === "Literal" ||
       (queryVariableDefinition.init.type === "TemplateLiteral" &&
         queryVariableDefinition.init.expressions.length === 0)
     ) {
-      return
+      return;
     }
   }
 
   context.report({
     node: node.callee.property,
     messageId,
-  })
+  });
 }

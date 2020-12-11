@@ -1,10 +1,10 @@
 module.exports = {
   parserOptions: {
-    ecmaVersion: 2017
+    ecmaVersion: 2017,
   },
   env: {
     node: true,
-    es6: true
+    es6: true,
   },
-  extends: "eslint:recommended"
-}
+  extends: ["eslint:recommended", "prettier"],
+};

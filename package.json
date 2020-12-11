@@ -9,14 +9,19 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "test": "jest && yarn lint",
-    "lint": "eslint .",
+    "test": "jest",
+    "test:watch": "yarn test --watchAll",
+    "lint": "prettier --check ./**/*.js && eslint .",
+    "lint:fix": "prettier --write ./**/*.js && eslint --fix",
     "release": "np"
   },
   "devDependencies": {
     "eslint": "^7.14.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.22.1",
-    "jest": "^26.6.3"
+    "eslint-config-prettier": "^7.0.0",
+    "jest": "^26.6.3",
+    "prettier": "^2.2.1"
+  },
+  "prettier": {
+    "trailingComma": "all"
   }
 }

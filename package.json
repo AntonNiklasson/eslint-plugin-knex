@@ -9,8 +9,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "test": "jest && yarn lint",
-    "test:watch": "jest --watchAll",
+    "test": "jest",
+    "test:watch": "yarn test --watchAll",
     "lint": "prettier --check ./**/*.js && eslint .",
     "lint:fix": "prettier --write ./**/*.js && eslint --fix",
     "release": "np"

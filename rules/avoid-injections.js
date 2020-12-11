@@ -24,6 +24,8 @@ module.exports = {
   },
 }
 
+console.log(anton)
+
 function check(context, node) {
   const statement = node.callee.property.name
   const messageId =

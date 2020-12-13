@@ -5,9 +5,7 @@ module.exports = {
       description: "Avoid SQL injections",
     },
     messages: {
-      "avoid-raw": `Avoid using knex.raw() with an interpolated string`,
-      "avoid-whereraw": `Avoid using .whereRaw() with an interpolated string`,
-      "avoid-joinraw": `Avoid using .joinRaw() with an interpolated string`,
+      avoid: `Avoid using {{query}}() with an interpolated string`,
     },
   },
 
@@ -26,14 +24,6 @@ module.exports = {
 
 function check(context, node) {
   const statement = node.callee.property.name;
-  const messageId =
-    statement === "raw"
-      ? "avoid-raw"
-      : statement === "whereRaw"
-      ? "avoid-whereraw"
-      : statement === "joinRaw"
-      ? "avoid-joinraw"
-      : null;
   const queryNode = node.arguments[0];
 
   if (
@@ -44,9 +34,23 @@ function check(context, node) {
   }
 
   if (queryNode.type === "Identifier") {
-    const queryVariableDefinition = context
-      .getScope(queryNode)
-      .variables.find((v) => v.name === queryNode.name).defs[0].node;
+    let currentScope = context.getScope();
+
+    while (
+      currentScope.upper &&
+      !currentScope.variables.find(v => v.name === queryNode.name)
+    ) {
+      currentScope = currentScope.upper;
+    }
+
+    const variableDefinition = currentScope.variables.find(
+      v => v.name === queryNode.name,
+    );
+
+    // The input variable is not defined?
+    if (!variableDefinition) return;
+
+    const queryVariableDefinition = variableDefinition.defs[0].node;
 
     if (
       queryVariableDefinition.init.type === "Literal" ||
@@ -59,6 +63,9 @@ function check(context, node) {
 
   context.report({
     node: node.callee.property,
-    messageId,
+    messageId: "avoid",
+    data: {
+      query: statement,
+    },
   });
 }

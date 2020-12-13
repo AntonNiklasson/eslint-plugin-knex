@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-knex",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "maintainer": "Anton Niklasson <anton@finhack.se>",
   "repository": {
     "type": "git",

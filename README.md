@@ -24,10 +24,4 @@ In your eslint config file:
 
 ### `knex/avoid-injections`
 
-Avoid some of the more obvious issues when it comes to SQL injection. This rule disallows any kind of interpolated string as the first argument to `.raw()`, `.whereRaw`, and `.joinRaw`.
-
-## Development
-
-Here's a good starting point for working with the rule in ASTExplorer:
-
-https://astexplorer.net/#/gist/01bce73cb93c30d0a83fdc1502c129c9/2ac43132c3bbdf9ada9dcc26a55fae33bfbc2085
+Avoid some issues related to SQL injection by disallowing plain strings as the query argument to the raw queries. Check out [the tests](https://github.com/AntonNiklasson/eslint-plugin-knex/blob/master/rules/avoid-injections.test.js) to get a sense for what is valid and not.

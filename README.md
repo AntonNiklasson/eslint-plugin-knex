@@ -1,5 +1,7 @@
 # eslint-plugin-knex
 
+[![npm version](https://badge.fury.io/js/eslint-plugin-knex.svg)](https://badge.fury.io/js/eslint-plugin-knex)
+
 ## Installation
 
 ```

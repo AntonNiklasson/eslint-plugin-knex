@@ -26,6 +26,13 @@ ruleTester.run("avoid-injections", rule, {
     "knex('users').whereRaw('id = ?', [1]);",
     "knex('users').whereRaw(`id = 1`);",
     "const joinCondition = `blog_posts ON users.id = blog_posts.author`; knex('users').select(['email']).joinRaw(joinCondition)",
+    `function thing1() {
+      return {
+        thing2: () => {},
+      };
+    }
+    thing1().thing2();
+    `,
   ],
   invalid: [
     // .raw()

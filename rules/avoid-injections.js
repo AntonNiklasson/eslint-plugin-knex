@@ -26,11 +26,10 @@ function check(context, node) {
   const statement = node.callee.property.name;
   const queryNode = node.arguments[0];
 
-  if (queryNode === undefined) return;
-
   if (
-    queryNode.type === "TemplateLiteral" &&
-    queryNode.expressions.length === 0
+    queryNode === undefined ||
+    (queryNode.type === "TemplateLiteral" &&
+      queryNode.expressions.length === 0)
   ) {
     return;
   }

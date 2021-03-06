@@ -28,8 +28,7 @@ function check(context, node) {
 
   if (
     queryNode === undefined ||
-    (queryNode.type === "TemplateLiteral" &&
-      queryNode.expressions.length === 0)
+    (queryNode.type === "TemplateLiteral" && queryNode.expressions.length === 0)
   ) {
     return;
   }

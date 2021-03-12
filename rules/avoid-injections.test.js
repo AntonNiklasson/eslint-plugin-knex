@@ -34,14 +34,7 @@ ruleTester.run("avoid-injections", rule, {
     }
     sharp().raw();
     `,
-    `
-    page.drawText(text, {
-      x, y,
-      font: font,
-      size: fontSize,
-      color: rgb(26 / 255, 64 / 255, 109 / 255),
-    });
-    `,
+    "page.drawText(`${foo}bar`);",
   ],
   invalid: [
     // .raw()

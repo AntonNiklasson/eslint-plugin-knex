@@ -10,10 +10,11 @@ module.exports = {
   },
 
   create(context) {
+    const knexObject = /(knex|transaction)/;
     const rawStatements = /(raw|whereRaw|joinRaw)/;
 
     return {
-      [`CallExpression[callee.property.name=${rawStatements}][arguments.0.type!='Literal']`](
+      [`CallExpression[callee.object.name='lorem'][callee.property.name=${rawStatements}][arguments.0.type!='Literal']`](
         node,
       ) {
         check(context, node);

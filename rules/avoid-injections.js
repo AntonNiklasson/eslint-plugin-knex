@@ -10,7 +10,7 @@ module.exports = {
   },
 
   create(context) {
-    const rawStatements = /(raw|whereRaw|joinRaw)/;
+    const rawStatements = /^(raw|whereRaw|joinRaw)$/;
 
     return {
       [`CallExpression[callee.property.name=${rawStatements}][arguments.0.type!='Literal']`](

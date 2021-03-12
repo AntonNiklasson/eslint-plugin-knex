@@ -6,6 +6,11 @@
     "type": "git",
     "url": "https://www.github.com/antonniklasson/eslint-plugin-knex"
   },
+  "keywords": [
+    "eslint",
+    "eslintplugin",
+    "knex"
+  ],
   "main": "index.js",
   "license": "MIT",
   "scripts": {

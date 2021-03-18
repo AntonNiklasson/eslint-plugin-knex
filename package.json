@@ -16,6 +16,7 @@
   "scripts": {
     "test": "jest",
     "test:watch": "yarn test --watchAll",
+    "test:smoke": "eslint-remote-tester --config ./smoke-test/eslint-remote-tester.config.js",
     "lint": "prettier --check ./**/*.js && eslint .",
     "lint:fix": "prettier --write ./**/*.js && eslint --fix",
     "release": "np"
@@ -23,6 +24,7 @@
   "devDependencies": {
     "eslint": "^7.14.0",
     "eslint-config-prettier": "^7.0.0",
+    "eslint-remote-tester": "^1.1.0",
     "jest": "^26.6.3",
     "prettier": "^2.2.1"
   },

@@ -16,6 +16,19 @@ module.exports = {
       [`CallExpression[callee.property.name=${rawStatements}][arguments.0.type!='Literal']`](
         node,
       ) {
+        if (context.settings && context.settings.knex) {
+          const builder = node.callee.object;
+          const builderName = builder.name || builder.callee.name;
+          const { builderName: builderNamePattern } = context.settings.knex;
+
+          if (
+            builderNamePattern instanceof RegExp &&
+            !builderNamePattern.test(builderName)
+          ) {
+            return;
+          }
+        }
+
         check(context, node);
       },
     };

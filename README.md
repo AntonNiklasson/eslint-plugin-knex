@@ -22,6 +22,22 @@ In your eslint config file:
 }
 ```
 
+## Settings
+
+You can configure what names you intend to use for the knex client. Make sure to
+include the library itself (`knex`), but also transaction variables (`trx`,
+`transaction`).
+
+```
+{
+  "settings": {
+    "knex": {
+      "builderName": "^(knex|transaction)$"
+    }
+  }
+}
+```
+
 ## Rules
 
 ### `knex/avoid-injections`

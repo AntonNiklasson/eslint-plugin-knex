@@ -39,6 +39,17 @@ tester.run("avoid-injections", rule, {
         },
       },
     },
+    // knex.schema.raw()
+    "knex.schema.raw(`ALTER TABLE 'users' ADD COLUMN 'is_awesome' BOOLEAN NOT NULL DEFAULT false;`)",
+    {
+      code:
+        "knex.schema.raw(`ALTER TABLE 'users' ADD COLUMN 'is_awesome' BOOLEAN NOT NULL DEFAULT false;`)",
+      settings: {
+        knex: {
+          builderName: "^(knex|transaction)$",
+        },
+      },
+    },
   ],
   invalid: [
     // .raw()
@@ -80,6 +91,23 @@ tester.run("avoid-injections", rule, {
         settings: {
           knex: {
             builderName: /lorem/i,
+          },
+        },
+      },
+    ),
+
+    // knex.schema.raw()
+    invalidCase(
+      "knex.schema.raw(`ALTER TABLE 'users' ADD COLUMN 'is_awesome' BOOLEAN NOT NULL DEFAULT ${defaultAwesome};`)",
+      [{ messageId: "avoid", data: { query: "raw" } }],
+    ),
+    invalidCase(
+      "knex.schema.raw(`ALTER TABLE 'users' ADD COLUMN 'is_awesome' BOOLEAN NOT NULL DEFAULT ${defaultAwesome};`)",
+      [{ messageId: "avoid", data: { query: "raw" } }],
+      {
+        settings: {
+          knex: {
+            builderName: "^(knex|transaction)$",
           },
         },
       },

@@ -84,5 +84,17 @@ tester.run("avoid-injections", rule, {
         },
       },
     ),
+
+    invalidCase(
+      'db.wrapQuery("select * from " + table, null);',
+      [{ messageId: "avoid", data: { query: "wrapQuery" } }],
+      {
+        settings: {
+          knex: {
+            rawStatements: /^(raw|whereRaw|joinRaw|wrapQuery)$/,
+          },
+        },
+      },
+    ),
   ],
 });

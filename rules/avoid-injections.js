@@ -63,6 +63,8 @@ function check(context, node) {
     // The input variable is not defined?
     if (!variableDefinition) return;
 
+    if (variableDefinition.defs[0].type === "Parameter") return;
+
     const queryVariableDefinition = variableDefinition.defs[0].node;
 
     if (

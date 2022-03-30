@@ -29,6 +29,8 @@ tester.run("avoid-injections", rule, {
     `,
     "knex('users').whereRaw('id = ?', [1]);",
     "knex('users').whereRaw(`id = 1`);",
+    "const wrapQuery = (query, args) => knex.raw(query, args);",
+    "function wrapQuery(query, args) { return knex.raw(query, args); }",
     "const joinCondition = `blog_posts ON users.id = blog_posts.author`; knex('users').select(['email']).joinRaw(joinCondition)",
     `function sharp() { return { raw: () => {}, }; } sharp().raw();`,
     {

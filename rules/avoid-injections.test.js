@@ -45,6 +45,10 @@ tester.run("avoid-injections", rule, {
     invalidCase("knex.raw(`select * from ${table}`);", [
       { messageId: "avoid", data: { query: "raw" } },
     ]),
+    invalidCase(
+      "knex.raw('select * from ??',['users']);",
+      [{ messageId: "avoid", data: { query: "raw" } }],
+    ),
     invalidCase('knex.raw("select * from " + table);', [
       { messageId: "avoid", data: { query: "raw" } },
     ]),

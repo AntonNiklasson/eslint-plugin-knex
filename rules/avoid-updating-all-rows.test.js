@@ -17,6 +17,7 @@ const tester = new RuleTester({
 
 tester.run("avoid-updating-all-rows", rule, {
   valid: ["knex('books').where({id:1}).update({'status': 'archived'})",
+    "sequelize('books').update({'status': 'archived'})",
     {
       code: "knex('books').update({'status': 'archived'})",
       settings: {

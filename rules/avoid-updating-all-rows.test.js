@@ -16,10 +16,29 @@ const tester = new RuleTester({
 });
 
 tester.run("avoid-updating-all-rows", rule, {
-  valid: ["knex('books').where({id:1}).update({'status': 'archived'})"],
+  valid: ["knex('books').where({id:1}).update({'status': 'archived'})",
+    {
+      code: "knex('books').update({'status': 'archived'})",
+      settings: {
+        knex: {
+          rule: { "avoid-updating-all-rows": { tablesToIgnore: ["books"] } },
+        },
+      },
+    }],
   invalid: [
     invalidCase("knex('books').update({'status': 'archived'})", [
       { messageId: "avoid" },
     ]),
+    invalidCase("knex('books').update({'status': 'archived'})", [
+        { messageId: "avoid" }],
+      {
+        settings: {
+          knex: {
+            rule: { "avoid-updating-all-rows": { tablesToIgnore: ["author"] } },
+          },
+        },
+      },
+    ),
+
   ],
 });

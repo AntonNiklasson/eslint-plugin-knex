@@ -42,4 +42,22 @@ include the library itself (`knex`), but also transaction variables (`trx`,
 
 ### `knex/avoid-injections`
 
-Avoid some issues related to SQL injection by disallowing plain strings as the query argument to the raw queries. Check out [the tests](https://github.com/AntonNiklasson/eslint-plugin-knex/blob/master/rules/avoid-injections.test.js) to get a sense for what is valid and not.
+Avoid some issues related to SQL injection by disallowing plain strings as the query argument to the raw queries. Check
+out [the tests](https://github.com/AntonNiklasson/eslint-plugin-knex/blob/master/rules/avoid-injections.test.js) to get
+a sense for what is valid and not.
+
+### `knex/avoid-updating-all-rows`
+
+Avoid updating all rows of a table when unwanted.
+You can ignore tables for which it is a legitimate usage.
+
+```
+{
+  settings: {
+    knex: {
+      rule: { "avoid-updating-all-rows": { tablesToIgnore: ["author"] } },
+    },
+  }
+}
+```
+

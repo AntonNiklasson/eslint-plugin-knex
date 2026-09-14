@@ -38,6 +38,7 @@ module.exports = {
 function check(context, node) {
   const statement = node.callee.property.name;
   const queryNode = node.arguments[0];
+  const sourceCode = context.sourceCode ?? context.getSourceCode();
 
   if (
     queryNode === undefined ||
@@ -47,7 +48,9 @@ function check(context, node) {
   }
 
   if (queryNode.type === "Identifier") {
-    let currentScope = context.getScope();
+    let currentScope = sourceCode.getScope
+      ? sourceCode.getScope(node)
+      : context.getScope();
 
     while (
       currentScope.upper &&

@@ -6,7 +6,7 @@ name: Test & Validate
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 
 jobs:

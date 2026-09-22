@@ -6,7 +6,7 @@
 
 ```
 npm install -D eslint-plugin-knex
-yarn add -D eslint-plugin-knex
+pnpm add -D eslint-plugin-knex
 ```
 
 ## Usage

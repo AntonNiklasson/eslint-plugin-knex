@@ -24,3 +24,17 @@ jobs:
     - run: pnpm lint
     - run: pnpm test
 
+  eslint-versions:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Enable 9 and 10 after the scope lookup fix (issue #28).
+        eslint-version: [7, 8]
+    steps:
+    - uses: actions/checkout@v7
+    - uses: actions/setup-node@v7
+      with:
+        node-version: 22
+    - run: npm run test:eslint -- ${{ matrix.eslint-version }}
+

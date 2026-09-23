@@ -1,5 +1,12 @@
 const { RuleTester } = require("eslint");
 const rule = require("./avoid-injections");
+const eslintMajor = Number(
+  require("eslint/package.json").version.split(".")[0],
+);
+const testerOptions =
+  eslintMajor >= 9
+    ? { languageOptions: { ecmaVersion: 2015 } }
+    : { parserOptions: { ecmaVersion: 2015 } };
 
 function invalidCase(code, errors = [], others = {}) {
   return Object.assign(
@@ -11,15 +18,12 @@ function invalidCase(code, errors = [], others = {}) {
   );
 }
 
-const tester = new RuleTester({
-  parserOptions: { ecmaVersion: 2015 },
-});
+const tester = new RuleTester(testerOptions);
 
 tester.run("avoid-injections", rule, {
   valid: [
     "knex.raw('select ? from users', ['email'])",
     "knex.raw(`select * from users`)",
-    "knex.raw('select ? from users', ['email'])",
     `const query = 'SELECT * FROM users'; const result = knex.raw(query);`,
     `
     const query = \`now() + interval '123 seconds'\`;
@@ -62,9 +66,6 @@ tester.run("avoid-injections", rule, {
     ]),
     invalidCase("knex('users').whereRaw(`id = ${getId()}`);", [
       { messageId: "avoid", data: { query: "whereRaw" } },
-    ]),
-    invalidCase("knex('users').whereRaw(`id = ${getId()}`);", [
-      { messageId: "avoid" },
     ]),
 
     // .joinRaw()

@@ -34,18 +34,9 @@ for (const major of majors) {
     }
 
     writeFileSync(path.join(sandbox, "package.json"), '{"private":true}\n');
-    const tests = readdirSync(sandboxRules).filter(file =>
-      file.endsWith(".test.js"),
-    );
-    writeFileSync(
+    copyFileSync(
+      path.join(__dirname, "run-eslint-tests.js"),
       path.join(sandbox, "run-tests.js"),
-      [
-        'const { describe, it } = require("node:test");',
-        "global.describe = describe;",
-        "global.it = it;",
-        ...tests.map(file => `require(${JSON.stringify(`./rules/${file}`)});`),
-        "",
-      ].join("\n"),
     );
 
     console.log(`\n=== ESLint ${major} ===`);

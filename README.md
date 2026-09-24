@@ -32,6 +32,7 @@ include the library itself (`knex`), but also transaction variables (`trx`,
 {
   "settings": {
     "knex": {
+      "rawStatements": "^(raw|whereRaw|joinRaw)$",
       "builderName": "^(knex|transaction)$"
     }
   }

@@ -10,16 +10,29 @@ module.exports = {
   },
 
   create(context) {
-    const rawStatements = /^(raw|whereRaw|joinRaw)$/;
+    const options = {
+      rawStatements: /^(raw|whereRaw|joinRaw)$/,
+      builderNamePattern: null,
+    };
+
+    if (context.settings && context.settings.knex) {
+      const {
+        rawStatements,
+        builderName: builderNamePattern,
+      } = context.settings.knex;
+
+      if (rawStatements) options.rawStatements = rawStatements;
+      if (builderNamePattern) options.builderNamePattern = builderNamePattern;
+    }
 
     return {
-      [`CallExpression[callee.property.name=${rawStatements}][arguments.0.type!='Literal']`](
+      [`CallExpression[callee.property.name=${options.rawStatements}][arguments.0.type!='Literal']`](
         node,
       ) {
-        if (context.settings && context.settings.knex) {
+        const { builderNamePattern } = options;
+        if (builderNamePattern) {
           const builder = node.callee.object;
           const builderName = builder.name || builder.callee.name;
-          const { builderName: builderNamePattern } = context.settings.knex;
 
           if (
             builderNamePattern instanceof RegExp &&

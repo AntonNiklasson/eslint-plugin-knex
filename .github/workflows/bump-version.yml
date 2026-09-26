@@ -1,0 +1,79 @@
+name: Prepare version bump
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Semantic version bump to propose
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - prepatch
+          - preminor
+          - premajor
+          - prerelease
+      preid:
+        description: Prerelease identifier (used for prepatch/preminor/premajor/prerelease)
+        required: true
+        default: alpha
+        type: choice
+        options:
+          - alpha
+          - beta
+          - rc
+
+permissions:
+  contents: write # Push the version-bump branch.
+  pull-requests: write # Open the reviewable PR.
+
+concurrency:
+  group: version-bump
+  cancel-in-progress: false
+
+jobs:
+  propose:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Bump version without tagging or publishing
+        env:
+          BUMP: ${{ inputs.bump }}
+          PREID: ${{ inputs.preid }}
+        run: |
+          case "$BUMP" in
+            pre*) npm version "$BUMP" --preid "$PREID" --no-git-tag-version ;;
+            *) npm version "$BUMP" --no-git-tag-version ;;
+          esac
+          pnpm install --lockfile-only
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm test:eslint
+      - name: Open version-bump PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(node -p 'require("./package.json").version')
+          branch="an/release-v$version"
+          if git ls-remote --exit-code origin "refs/heads/$branch" >/dev/null; then
+            echo "Branch $branch already exists" >&2
+            exit 1
+          fi
+          git switch -c "$branch"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package.json pnpm-lock.yaml
+          git commit -m "chore: bump version to $version"
+          git push -u origin "$branch"
+          gh pr create --base main --head "$branch" \
+            --title "chore: bump version to $version" \
+            --body "Prepare v$version for the manual npm publish workflow. No release occurs when this PR merges."

@@ -65,6 +65,9 @@ tester.run("avoid-injections", rule, {
       "const email = 'user@domain.com'; const query = `SELECT * FROM users WHERE email='${email}'`; function run() { knex.raw(query); }",
       [{ messageId: "avoid", data: { query: "raw" } }],
     ),
+    invalidCase('const query = "select * from " + table; knex.raw(query);', [
+      { messageId: "avoid", data: { query: "raw" } },
+    ]),
 
     // .whereRaw()
     invalidCase("knex('users').whereRaw(`id = ${id}`);", [

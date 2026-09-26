@@ -63,12 +63,16 @@ function check(context, node) {
     // The input variable is not defined?
     if (!variableDefinition) return;
 
-    const queryVariableDefinition = variableDefinition.defs[0].node;
+    const definition = variableDefinition.defs[0];
+    const initializer = definition && definition.node && definition.node.init;
+
+    // Parameters, imports, and declarations without initializers cannot be checked.
+    if (!initializer) return;
 
     if (
-      queryVariableDefinition.init.type === "Literal" ||
-      (queryVariableDefinition.init.type === "TemplateLiteral" &&
-        queryVariableDefinition.init.expressions.length === 0)
+      initializer.type === "Literal" ||
+      (initializer.type === "TemplateLiteral" &&
+        initializer.expressions.length === 0)
     ) {
       return;
     }

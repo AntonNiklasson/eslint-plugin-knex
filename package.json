@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-knex",
-  "version": "0.2.2",
+  "version": "0.2.3-rc.0",
   "packageManager": "pnpm@12.5.1",
   "maintainer": "Anton Niklasson <anton@finhack.se>",
   "repository": {

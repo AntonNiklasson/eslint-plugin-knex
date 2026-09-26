@@ -41,9 +41,8 @@ include the library itself (`knex`), but also transaction variables (`trx`,
 ## Testing
 
 Run `pnpm test:eslint` to test the full rule suite against the latest ESLint 7
-and 8 releases. Run `pnpm test:eslint 9 10` to try the newer versions; those
-currently fail on identifier arguments until the scope lookup is fixed (issue
-#28). Enable 9 and 10 in the CI matrix once fixed. The harness installs ESLint
+and 8 releases. Run `pnpm test:eslint 9 10` to try the newer versions; ESLint
+9 and 10 are also included in the CI matrix. The harness installs ESLint
 in temporary directories without changing local dependencies or the lockfile.
 Requires Node.js 22 and npm.
 

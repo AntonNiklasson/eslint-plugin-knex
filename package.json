@@ -5,7 +5,7 @@
   "maintainer": "Anton Niklasson <anton@finhack.se>",
   "repository": {
     "type": "git",
-    "url": "https://www.github.com/antonniklasson/eslint-plugin-knex"
+    "url": "https://github.com/AntonNiklasson/eslint-plugin-knex"
   },
   "keywords": [
     "eslint",

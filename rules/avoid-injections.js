@@ -47,16 +47,21 @@ function check(context, node) {
   }
 
   if (queryNode.type === "Identifier") {
-    let currentScope = context.getScope();
+    // `context.getScope()` was removed in ESLint 9. Prefer the modern
+    // `SourceCode#getScope(node)` API and fall back for older versions.
+    const sourceCode = context.sourceCode || context.getSourceCode();
+    let scope = sourceCode.getScope
+      ? sourceCode.getScope(node)
+      : context.getScope();
 
     while (
-      currentScope.upper &&
-      !currentScope.variables.find(v => v.name === queryNode.name)
+      scope.upper &&
+      !scope.variables.find(v => v.name === queryNode.name)
     ) {
-      currentScope = currentScope.upper;
+      scope = scope.upper;
     }
 
-    const variableDefinition = currentScope.variables.find(
+    const variableDefinition = scope.variables.find(
       v => v.name === queryNode.name,
     );
 

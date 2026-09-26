@@ -25,6 +25,15 @@ tester.run("avoid-injections", rule, {
     "knex.raw('select ? from users', ['email'])",
     "knex.raw(`select * from users`)",
     `const query = 'SELECT * FROM users'; const result = knex.raw(query);`,
+    "function run(query) { return knex.raw(query); }",
+    "const run = query => knex.raw(query);",
+    "let query; knex.raw(query);",
+    Object.assign(
+      { code: "import query from './query'; knex.raw(query);" },
+      eslintMajor >= 9
+        ? { languageOptions: { sourceType: "module" } }
+        : { parserOptions: { sourceType: "module" } },
+    ),
     `
     const query = \`now() + interval '123 seconds'\`;
     function run() {

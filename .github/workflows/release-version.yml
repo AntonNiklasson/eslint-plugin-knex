@@ -3,10 +3,6 @@ name: Release version
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: Version already merged into package.json (for example, 0.2.3)
-        required: true
-        type: string
       dry_run:
         description: Run checks and preview the package without publishing or creating a release
         required: true
@@ -36,17 +32,13 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - name: Verify release version and select npm dist-tag
+      - name: Read package version and select npm dist-tag
         env:
-          REQUESTED_VERSION: ${{ inputs.version }}
           DIST_TAG: ${{ inputs.dist_tag }}
         run: |
           node <<'NODE'
           const fs = require('fs');
           const version = require('./package.json').version;
-          if (process.env.REQUESTED_VERSION !== version) {
-            throw new Error(`Requested ${process.env.REQUESTED_VERSION}, but package.json has ${version}`);
-          }
           const parsed = version.match(/^\d+\.\d+\.\d+(?:-([0-9A-Za-z-]+)(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z.-]+)?$/);
           if (!parsed) throw new Error(`Invalid release version: ${version}`);
           const prerelease = parsed[1];
@@ -54,8 +46,8 @@ jobs:
           if (!/^[a-z][a-z0-9-]*$/.test(tag) || (prerelease && tag === 'latest')) {
             throw new Error(`Invalid npm dist-tag ${tag} for version ${version}`);
           }
-          fs.appendFileSync(process.env.GITHUB_ENV, `PUBLISH_TAG=${tag}\nIS_PRERELEASE=${Boolean(prerelease)}\n`);
-          console.log(`Selected npm dist-tag: ${tag}`);
+          fs.appendFileSync(process.env.GITHUB_ENV, `RELEASE_VERSION=${version}\nPUBLISH_TAG=${tag}\nIS_PRERELEASE=${Boolean(prerelease)}\n`);
+          console.log(`Releasing ${version} with npm dist-tag ${tag}`);
           NODE
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
@@ -71,10 +63,9 @@ jobs:
         if: ${{ !inputs.dry_run }}
         env:
           GH_TOKEN: ${{ github.token }}
-          VERSION: ${{ inputs.version }}
         run: |
           args=(--target "$GITHUB_SHA" --generate-notes)
           if [ "$IS_PRERELEASE" = true ]; then
             args+=(--prerelease)
           fi
-          gh release create "v$VERSION" "${args[@]}"
+          gh release create "v$RELEASE_VERSION" "${args[@]}"

@@ -18,40 +18,44 @@ In your eslint config file:
   "plugins": ["knex"],
   "rules": {
     "knex/avoid-injections": "error"
+  },
+  "settings": {
+    "knex": {
+      "builderName": "^(knex|trx|transaction)$"
+    }
   }
 }
 ```
 
 ## Settings
 
-You can configure what names you intend to use for the knex client. Make sure to
-include the library itself (`knex`), but also transaction variables (`trx`,
-`transaction`).
-
-```
-{
-  "settings": {
-    "knex": {
-      "builderName": "^(knex|transaction)$"
-    }
-  }
-}
-```
-
-`builderName` accepts a regular-expression string (or a `RegExp` in JavaScript
-configs). Invalid patterns or other values are ignored, so the rule checks all
-raw-query calls as it does without this setting.
-
-## Testing
-
-Run `pnpm test:eslint` to test the full rule suite against the latest ESLint 7
-and 8 releases. Run `pnpm test:eslint 9 10` to try the newer versions; ESLint
-9 and 10 are also included in the CI matrix. The harness installs ESLint
-in temporary directories without changing local dependencies or the lockfile.
-Requires Node.js 22 and npm.
+`builderName` is optional. Without it, the rule checks every call named `raw`,
+`whereRaw`, or `joinRaw`, including non-Knex calls. Set it to a regex string
+(or a `RegExp` in a JS config) to filter builder names. Invalid values are
+ignored, leaving all names checked.
 
 ## Rules
 
 ### `knex/avoid-injections`
 
-Avoid some issues related to SQL injection by disallowing plain strings as the query argument to the raw queries. Check out [the tests](https://github.com/AntonNiklasson/eslint-plugin-knex/blob/main/rules/avoid-injections.test.js) to get a sense for what is valid and not.
+Checks the first SQL argument of `raw`, `whereRaw`, and `joinRaw`:
+
+```js
+knex.raw("select * from users where id = ?", [id]); // OK: binding
+knex.raw(`select * from users where id = ${id}`); // reported
+```
+
+Static strings/templates are accepted; interpolation and concatenation are
+reported. For a query variable, only its initializer is checked:
+
+```js
+let query = "select * from users";
+query += userInput;
+knex.raw(query); // not reported: subsequent writes aren't tracked
+```
+
+Limits: parameters, imports and uninitialized variables are skipped; aliases,
+control flow and computed methods (`knex["raw"]`) aren't tracked. A non-Knex
+`.raw()` may be reported (false positive), while a dynamic query passed as a
+parameter may be missed (false negative). This is **not** complete SQL-injection
+analysis; use bindings, validation and security review too.

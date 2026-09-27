@@ -42,17 +42,8 @@ tester.run("avoid-injections", rule, {
     `,
     "knex('users').whereRaw('id = ?', [1]);",
     "knex('users').joinRaw('join posts on posts.user_id = users.id');",
-    // Extra methods still produce no report without the opt-in option.
-    "knex('users').orWhereRaw('id = ?', [id]);",
-    "knex('users').orWhereRaw(`id = ${id}`);",
-    "knex('users').havingRaw('count(*) > ?', [minimum]);",
-    "knex('users').havingRaw(`count(*) > ${minimum}`);",
-    "knex('users').orHavingRaw('count(*) > ?', [minimum]);",
-    "knex('users').orHavingRaw(`count(*) > ${minimum}`);",
     "knex('users').groupByRaw('year(created_at)');",
-    "knex('users').groupByRaw(`year(${column})`);",
     "knex('users').orderByRaw('name asc');",
-    "knex('users').orderByRaw(`${column} asc`);",
     "knex.raw('select * from users where id = ?', [id]);",
     "knex('users').joinRaw('join posts on posts.user_id = ?', [id]);",
     ...[
@@ -61,10 +52,10 @@ tester.run("avoid-injections", rule, {
       ["orHavingRaw", "count(*) > ?", "minimum"],
       ["groupByRaw", "coalesce(??, ?)", "'name', 'n/a'"],
       ["orderByRaw", "?? asc", "column"],
-    ].map(([method, sql, bindings]) => ({
-      code: `knex('users').${method}('${sql}', [${bindings}]);`,
-      options: [{ additionalRawMethods: [method] }],
-    })),
+    ].map(
+      ([method, sql, bindings]) =>
+        `knex('users').${method}('${sql}', [${bindings}]);`,
+    ),
     "knex('users').whereRaw(`id = 1`);",
     "const joinCondition = `blog_posts ON users.id = blog_posts.author`; knex('users').select(['email']).joinRaw(joinCondition)",
     `function sharp() { return { raw: () => {}, }; } sharp().raw();`,
@@ -98,11 +89,9 @@ tester.run("avoid-injections", rule, {
       "groupByRaw",
       "orderByRaw",
     ].map(method =>
-      invalidCase(
-        `knex('users').${method}(\`unsafe ${"${input}"}\`);`,
-        [{ messageId: "avoid", data: { query: method } }],
-        { options: [{ additionalRawMethods: [method] }] },
-      ),
+      invalidCase(`knex('users').${method}(\`unsafe ${"${input}"}\`);`, [
+        { messageId: "avoid", data: { query: method } },
+      ]),
     ),
     // .raw()
     invalidCase("knex.raw(`select * from ${table}`);", [

@@ -3,7 +3,7 @@
 Checked against Knex 3.3.0 (npm latest, 2026-09-27),
 https://knexjs.org/guide/raw.html and https://knexjs.org/guide/query-builder.html.
 
-| Method | Current default | Binding example | Unsafe interpolation example |
+| Method | Default in 0.2.x | Binding example | Unsafe interpolation example |
 | --- | --- | --- | --- |
 | `raw` | yes | `knex.raw('select ?', [id])` | ``knex.raw(`select ${id}`)`` |
 | `whereRaw` | yes | `knex('t').whereRaw('id = ?', [id])` | ``knex('t').whereRaw(`id = ${id}`)`` |
@@ -21,7 +21,6 @@ filter (#16). `knex.raw(...)` and builder `.raw(...)` share the same method
 spelling. Dynamic/computed method names and user-defined raw wrappers need
 different analysis; neither is included in this audit.
 
-The test cases for additional methods are deliberately **valid** even with
-interpolation when the option is absent, locking in default findings. With
-`additionalRawMethods` enabled, unsafe interpolation reports and bound queries
-remain valid. No default sink is added here.
+In 0.3.0, all listed methods are checked by default. This intentionally
+changes findings for the five methods marked "no" above: unsafe interpolation
+reports, while bound queries remain valid.

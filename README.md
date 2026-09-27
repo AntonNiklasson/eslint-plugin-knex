@@ -47,8 +47,8 @@ against ESLint 7, 8, 9 and 10 in CI. ESLint 8 also supports flat config via
 
 ## Settings
 
-`builderName` is optional. Without it, the rule checks every call named `raw`,
-`whereRaw`, or `joinRaw`, including non-Knex calls. Set it to a regex string
+`builderName` is optional. Without it, the rule checks every call using one of
+the raw-query methods listed below, including non-Knex calls. Set it to a regex string
 (or a `RegExp` in a JS config) to filter builder names. Invalid values are
 ignored, leaving all names checked.
 
@@ -56,7 +56,11 @@ ignored, leaving all names checked.
 
 ### `knex/avoid-injections`
 
-Checks the first SQL argument of `raw`, `whereRaw`, and `joinRaw`:
+Checks the first SQL argument of `raw`, `whereRaw`, `joinRaw`, `orWhereRaw`,
+`havingRaw`, `orHavingRaw`, `groupByRaw`, and `orderByRaw` by default.
+
+**0.3.0 changes default findings:** the last five methods were not checked in
+0.2.x, so upgrading may introduce new lint errors.
 
 ```js
 knex.raw("select * from users where id = ?", [id]); // OK: binding
@@ -64,22 +68,8 @@ knex.raw(`select * from users where id = ${id}`); // reported
 ```
 
 Static strings/templates are accepted; interpolation and concatenation are
-reported. To check more raw-query methods, opt in per rule configuration:
-
-```js
-{
-  "rules": {
-    "knex/avoid-injections": ["error", {
-      "additionalRawMethods": ["orWhereRaw", "havingRaw", "orHavingRaw", "groupByRaw", "orderByRaw"]
-    }]
-  }
-}
-```
-
-Only `raw`, `whereRaw`, and `joinRaw` are checked by default. Extra methods
-use the same first-argument syntax check; bindings remain the safer choice.
-
-For a query variable, only its initializer is checked:
+reported. Bindings remain the safer choice. For a query variable, only its
+initializer is checked:
 
 ```js
 let query = "select * from users";

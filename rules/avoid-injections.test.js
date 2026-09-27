@@ -41,14 +41,30 @@ tester.run("avoid-injections", rule, {
     }
     `,
     "knex('users').whereRaw('id = ?', [1]);",
-    {
-      code: "knex('users').havingRaw('count(*) > ?', [minimum]);",
-      options: [{ additionalRawMethods: ["havingRaw"] }],
-    },
-    {
-      code: "knex('users').orderByRaw('?? asc', [column]);",
-      options: [{ additionalRawMethods: ["orderByRaw"] }],
-    },
+    "knex('users').joinRaw('join posts on posts.user_id = users.id');",
+    // Extra methods still produce no report without the opt-in option.
+    "knex('users').orWhereRaw('id = ?', [id]);",
+    "knex('users').orWhereRaw(`id = ${id}`);",
+    "knex('users').havingRaw('count(*) > ?', [minimum]);",
+    "knex('users').havingRaw(`count(*) > ${minimum}`);",
+    "knex('users').orHavingRaw('count(*) > ?', [minimum]);",
+    "knex('users').orHavingRaw(`count(*) > ${minimum}`);",
+    "knex('users').groupByRaw('year(created_at)');",
+    "knex('users').groupByRaw(`year(${column})`);",
+    "knex('users').orderByRaw('name asc');",
+    "knex('users').orderByRaw(`${column} asc`);",
+    "knex.raw('select * from users where id = ?', [id]);",
+    "knex('users').joinRaw('join posts on posts.user_id = ?', [id]);",
+    ...[
+      ["orWhereRaw", "id = ?", "id"],
+      ["havingRaw", "count(*) > ?", "minimum"],
+      ["orHavingRaw", "count(*) > ?", "minimum"],
+      ["groupByRaw", "coalesce(??, ?)", "'name', 'n/a'"],
+      ["orderByRaw", "?? asc", "column"],
+    ].map(([method, sql, bindings]) => ({
+      code: `knex('users').${method}('${sql}', [${bindings}]);`,
+      options: [{ additionalRawMethods: [method] }],
+    })),
     "knex('users').whereRaw(`id = 1`);",
     "const joinCondition = `blog_posts ON users.id = blog_posts.author`; knex('users').select(['email']).joinRaw(joinCondition)",
     `function sharp() { return { raw: () => {}, }; } sharp().raw();`,

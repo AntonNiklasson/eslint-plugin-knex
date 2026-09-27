@@ -22,6 +22,24 @@ In your eslint config file:
 }
 ```
 
+For ESLint 9 and 10, use `eslint.config.js` (CommonJS):
+
+```js
+const knex = require("eslint-plugin-knex");
+
+module.exports = [
+  {
+    plugins: { knex },
+    rules: { "knex/avoid-injections": "error" },
+    settings: { knex: { builderName: "^(knex|trx|transaction)$" } },
+  },
+];
+```
+
+The eslintrc example above works with ESLint 7 and 8. The rule tests run
+against ESLint 7, 8, 9 and 10 in CI. ESLint 8 also supports flat config via
+`ESLINT_USE_FLAT_CONFIG=true`; ESLint 9+ defaults to flat config.
+
 ## Settings
 
 You can configure what names you intend to use for the knex client. Make sure to

@@ -41,6 +41,21 @@ tester.run("avoid-injections", rule, {
     }
     `,
     "knex('users').whereRaw('id = ?', [1]);",
+    "knex('users').joinRaw('join posts on posts.user_id = users.id');",
+    "knex('users').groupByRaw('year(created_at)');",
+    "knex('users').orderByRaw('name asc');",
+    "knex.raw('select * from users where id = ?', [id]);",
+    "knex('users').joinRaw('join posts on posts.user_id = ?', [id]);",
+    ...[
+      ["orWhereRaw", "id = ?", "id"],
+      ["havingRaw", "count(*) > ?", "minimum"],
+      ["orHavingRaw", "count(*) > ?", "minimum"],
+      ["groupByRaw", "coalesce(??, ?)", "'name', 'n/a'"],
+      ["orderByRaw", "?? asc", "column"],
+    ].map(
+      ([method, sql, bindings]) =>
+        `knex('users').${method}('${sql}', [${bindings}]);`,
+    ),
     "knex('users').whereRaw(`id = 1`);",
     "const joinCondition = `blog_posts ON users.id = blog_posts.author`; knex('users').select(['email']).joinRaw(joinCondition)",
     `function sharp() { return { raw: () => {}, }; } sharp().raw();`,
@@ -67,6 +82,17 @@ tester.run("avoid-injections", rule, {
     },
   ],
   invalid: [
+    ...[
+      "orWhereRaw",
+      "havingRaw",
+      "orHavingRaw",
+      "groupByRaw",
+      "orderByRaw",
+    ].map(method =>
+      invalidCase(`knex('users').${method}(\`unsafe ${"${input}"}\`);`, [
+        { messageId: "avoid", data: { query: method } },
+      ]),
+    ),
     // .raw()
     invalidCase("knex.raw(`select * from ${table}`);", [
       { messageId: "avoid", data: { query: "raw" } },

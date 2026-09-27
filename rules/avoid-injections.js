@@ -12,7 +12,7 @@ module.exports = {
   },
 
   create(context) {
-    const rawStatements = /^(raw|whereRaw|joinRaw)$/;
+    const rawStatements = /^(raw|whereRaw|joinRaw|orWhereRaw|havingRaw|orHavingRaw|groupByRaw|orderByRaw)$/;
     const configuredName =
       context.settings &&
       context.settings.knex &&

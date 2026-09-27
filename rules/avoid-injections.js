@@ -6,6 +6,13 @@ module.exports = {
     docs: {
       description: "Avoid SQL injections",
     },
+    schema: [
+      {
+        type: "object",
+        properties: { checkQueryReassignments: { type: "boolean" } },
+        additionalProperties: false,
+      },
+    ],
     messages: {
       avoid: `Avoid using {{query}}() with an interpolated string`,
     },
@@ -88,7 +95,30 @@ function check(context, node) {
       (initializer.type === "TemplateLiteral" &&
         initializer.expressions.length === 0)
     ) {
-      return;
+      if (!context.options[0] || !context.options[0].checkQueryReassignments) {
+        return;
+      }
+
+      const hasUnsafeWrite = variableDefinition.references.some(reference => {
+        if (
+          reference.from !== variableDefinition.scope ||
+          !reference.isWrite() ||
+          reference.identifier === definition.node.id ||
+          reference.identifier.range[0] >= queryNode.range[0]
+        ) {
+          return false;
+        }
+        const assignment = reference.identifier.parent;
+        if (!assignment || assignment.type !== "AssignmentExpression")
+          return false;
+        if (assignment.operator !== "=") return true;
+        const value = assignment.right;
+        return !(
+          value.type === "Literal" ||
+          (value.type === "TemplateLiteral" && value.expressions.length === 0)
+        );
+      });
+      if (!hasUnsafeWrite) return;
     }
   }
 

@@ -77,6 +77,12 @@ query += userInput;
 knex.raw(query); // not reported: subsequent writes aren't tracked
 ```
 
+To detect query variables modified in the same scope before the call, opt in
+with `"knex/avoid-injections": ["error", { "checkQueryReassignments": true }]`.
+This catches the example above while leaving static assignments and bound
+parameters valid. It does not follow writes in nested functions, aliases or
+control flow, and is off by default.
+
 Limits: parameters, imports and uninitialized variables are skipped; aliases,
 control flow and computed methods (`knex["raw"]`) aren't tracked. A non-Knex
 `.raw()` may be reported (false positive), while a dynamic query passed as a

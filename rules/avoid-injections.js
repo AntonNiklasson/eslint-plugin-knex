@@ -1,3 +1,5 @@
+const getBuilderName = require("./get-builder-name");
+
 module.exports = {
   meta: {
     type: "problem",
@@ -31,11 +33,7 @@ module.exports = {
         node,
       ) {
         if (builderNamePattern instanceof RegExp) {
-          const builder = node.callee.object;
-          const builderName =
-            builder.name ||
-            (builder.type === "CallExpression" && builder.callee.name) ||
-            (builder.type === "MemberExpression" && builder.object.name);
+          const builderName = getBuilderName(node.callee.object);
 
           if (!builderName || !builderNamePattern.test(builderName)) return;
         }

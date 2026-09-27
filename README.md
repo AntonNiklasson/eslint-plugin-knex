@@ -41,6 +41,17 @@ module.exports = [
 ];
 ```
 
+Or use the flat recommended preset (ESLint 9+):
+
+```js
+// eslint.config.js
+const knex = require("eslint-plugin-knex");
+module.exports = [knex.configs["flat/recommended"]];
+```
+
+The preset enables only `knex/avoid-injections` with its current defaults;
+`plugins: ["knex"]` in eslintrc remains supported.
+
 The eslintrc example above works with ESLint 7 and 8. The rule tests run
 against ESLint 7, 8, 9 and 10 in CI. ESLint 8 also supports flat config via
 `ESLINT_USE_FLAT_CONFIG=true`; ESLint 9+ defaults to flat config.

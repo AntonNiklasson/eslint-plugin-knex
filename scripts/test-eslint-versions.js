@@ -33,7 +33,21 @@ for (const major of majors) {
       copyFileSync(path.join(rules, file), path.join(sandboxRules, file));
     }
 
-    writeFileSync(path.join(sandbox, "package.json"), '{"private":true}\n');
+    writeFileSync(
+      path.join(sandbox, "package.json"),
+      JSON.stringify({
+        private: true,
+        version: require("../package.json").version,
+      }),
+    );
+    copyFileSync(
+      path.join(__dirname, "..", "index.js"),
+      path.join(sandbox, "index.js"),
+    );
+    copyFileSync(
+      path.join(__dirname, "test-flat-config.js"),
+      path.join(sandbox, "test-flat-config.js"),
+    );
     copyFileSync(
       path.join(__dirname, "run-eslint-tests.js"),
       path.join(sandbox, "run-tests.js"),
@@ -68,6 +82,14 @@ for (const major of majors) {
     );
     if (result.error) throw result.error;
     if (result.status !== 0) failed = true;
+    if (Number(major) >= 9) {
+      const flatResult = spawnSync(process.execPath, ["test-flat-config.js"], {
+        cwd: sandbox,
+        stdio: "inherit",
+      });
+      if (flatResult.error) throw flatResult.error;
+      if (flatResult.status !== 0) failed = true;
+    }
   } catch (error) {
     console.error(error);
     failed = true;

@@ -20,6 +20,21 @@ jobs:
     - run: pnpm lint
     - run: pnpm test
 
+  runtime-compatibility:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ['12.22.12', '20', '24']
+    steps:
+    - uses: actions/checkout@v7
+    - uses: actions/setup-node@v7
+      with:
+        node-version: ${{ matrix.node-version }}
+    # Keep checking the oldest working runtime without requiring modern pnpm or
+    # dev tooling (which may no longer support Node 12).
+    - run: node -e "const p = require('./'); if (!p.rules['avoid-injections']) process.exit(1)"
+
   eslint-versions:
     runs-on: ubuntu-latest
     strategy:

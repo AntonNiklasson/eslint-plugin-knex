@@ -53,6 +53,15 @@ tester.run("avoid-injections", rule, {
       },
     },
     {
+      code:
+        "class Test { constructor({ knex }) { this.knex = knex; } query() { const query = 'select ? from users'; return this.knex.raw(query, ['email']); } }",
+      settings: { knex: { builderName: "^knex$" } },
+    },
+    {
+      code: "this[knex].raw(`select * from ${table}`);",
+      settings: { knex: { builderName: "^knex$" } },
+    },
+    {
       code: "trx.raw(`select * from ${table}`);",
       settings: { knex: { builderName: "^(knex|transaction)$" } },
     },
@@ -102,7 +111,17 @@ tester.run("avoid-injections", rule, {
       },
     ),
     invalidCase(
+      "knex('users').whereRaw(`id = ${id}`);",
+      [{ messageId: "avoid", data: { query: "whereRaw" } }],
+      { settings: { knex: { builderName: "^knex$" } } },
+    ),
+    invalidCase(
       "knex.schema.raw(`select * from ${table}`);",
+      [{ messageId: "avoid", data: { query: "raw" } }],
+      { settings: { knex: { builderName: "^knex$" } } },
+    ),
+    invalidCase(
+      "class Test { query(table) { return this.knex.raw(`select * from ${table}`); } }",
       [{ messageId: "avoid", data: { query: "raw" } }],
       { settings: { knex: { builderName: "^knex$" } } },
     ),

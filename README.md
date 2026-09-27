@@ -38,6 +38,10 @@ include the library itself (`knex`), but also transaction variables (`trx`,
 }
 ```
 
+`builderName` accepts a regular-expression string (or a `RegExp` in JavaScript
+configs). Invalid patterns or other values are ignored, so the rule checks all
+raw-query calls as it does without this setting.
+
 ## Testing
 
 Run `pnpm test:eslint` to test the full rule suite against the latest ESLint 7

@@ -64,7 +64,22 @@ knex.raw(`select * from users where id = ${id}`); // reported
 ```
 
 Static strings/templates are accepted; interpolation and concatenation are
-reported. For a query variable, only its initializer is checked:
+reported. To check more raw-query methods, opt in per rule configuration:
+
+```js
+{
+  "rules": {
+    "knex/avoid-injections": ["error", {
+      "additionalRawMethods": ["orWhereRaw", "havingRaw", "orHavingRaw", "groupByRaw", "orderByRaw"]
+    }]
+  }
+}
+```
+
+Only `raw`, `whereRaw`, and `joinRaw` are checked by default. Extra methods
+use the same first-argument syntax check; bindings remain the safer choice.
+
+For a query variable, only its initializer is checked:
 
 ```js
 let query = "select * from users";

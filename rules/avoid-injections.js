@@ -6,13 +6,38 @@ module.exports = {
     docs: {
       description: "Avoid SQL injections",
     },
+    schema: [
+      {
+        type: "object",
+        properties: {
+          additionalRawMethods: {
+            type: "array",
+            uniqueItems: true,
+            items: {
+              enum: [
+                "orWhereRaw",
+                "havingRaw",
+                "orHavingRaw",
+                "groupByRaw",
+                "orderByRaw",
+              ],
+            },
+          },
+        },
+        additionalProperties: false,
+      },
+    ],
     messages: {
       avoid: `Avoid using {{query}}() with an interpolated string`,
     },
   },
 
   create(context) {
-    const rawStatements = /^(raw|whereRaw|joinRaw)$/;
+    const additional =
+      (context.options[0] && context.options[0].additionalRawMethods) || [];
+    const rawStatements = new RegExp(
+      `^(${["raw", "whereRaw", "joinRaw", ...additional].join("|")})$`,
+    );
     const configuredName =
       context.settings &&
       context.settings.knex &&

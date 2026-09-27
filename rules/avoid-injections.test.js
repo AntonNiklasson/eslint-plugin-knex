@@ -41,6 +41,14 @@ tester.run("avoid-injections", rule, {
     }
     `,
     "knex('users').whereRaw('id = ?', [1]);",
+    {
+      code: "knex('users').havingRaw('count(*) > ?', [minimum]);",
+      options: [{ additionalRawMethods: ["havingRaw"] }],
+    },
+    {
+      code: "knex('users').orderByRaw('?? asc', [column]);",
+      options: [{ additionalRawMethods: ["orderByRaw"] }],
+    },
     "knex('users').whereRaw(`id = 1`);",
     "const joinCondition = `blog_posts ON users.id = blog_posts.author`; knex('users').select(['email']).joinRaw(joinCondition)",
     `function sharp() { return { raw: () => {}, }; } sharp().raw();`,
@@ -67,6 +75,19 @@ tester.run("avoid-injections", rule, {
     },
   ],
   invalid: [
+    ...[
+      "orWhereRaw",
+      "havingRaw",
+      "orHavingRaw",
+      "groupByRaw",
+      "orderByRaw",
+    ].map(method =>
+      invalidCase(
+        `knex('users').${method}(\`unsafe ${"${input}"}\`);`,
+        [{ messageId: "avoid", data: { query: method } }],
+        { options: [{ additionalRawMethods: [method] }] },
+      ),
+    ),
     // .raw()
     invalidCase("knex.raw(`select * from ${table}`);", [
       { messageId: "avoid", data: { query: "raw" } },

@@ -32,9 +32,12 @@ module.exports = {
       ) {
         if (builderNamePattern instanceof RegExp) {
           const builder = node.callee.object;
-          const builderName = builder.name || builder.callee.name;
+          const builderName =
+            builder.name ||
+            (builder.type === "CallExpression" && builder.callee.name) ||
+            (builder.type === "MemberExpression" && builder.object.name);
 
-          if (!builderNamePattern.test(builderName)) return;
+          if (!builderName || !builderNamePattern.test(builderName)) return;
         }
 
         check(context, node);

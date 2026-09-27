@@ -102,6 +102,11 @@ tester.run("avoid-injections", rule, {
       },
     ),
     invalidCase(
+      "knex.schema.raw(`select * from ${table}`);",
+      [{ messageId: "avoid", data: { query: "raw" } }],
+      { settings: { knex: { builderName: "^knex$" } } },
+    ),
+    invalidCase(
       "transaction.raw(`select * from ${table}`);",
       [{ messageId: "avoid", data: { query: "raw" } }],
       { settings: { knex: { builderName: "^(knex|transaction)$" } } },

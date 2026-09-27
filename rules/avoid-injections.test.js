@@ -52,6 +52,10 @@ tester.run("avoid-injections", rule, {
         },
       },
     },
+    {
+      code: "trx.raw(`select * from ${table}`);",
+      settings: { knex: { builderName: "^(knex|transaction)$" } },
+    },
   ],
   invalid: [
     // .raw()
@@ -96,6 +100,21 @@ tester.run("avoid-injections", rule, {
           },
         },
       },
+    ),
+    invalidCase(
+      "transaction.raw(`select * from ${table}`);",
+      [{ messageId: "avoid", data: { query: "raw" } }],
+      { settings: { knex: { builderName: "^(knex|transaction)$" } } },
+    ),
+    invalidCase(
+      "knex.raw(`select * from ${table}`);",
+      [{ messageId: "avoid", data: { query: "raw" } }],
+      { settings: { knex: { builderName: "[" } } },
+    ),
+    invalidCase(
+      "knex.raw(`select * from ${table}`);",
+      [{ messageId: "avoid", data: { query: "raw" } }],
+      { settings: { knex: { builderName: 123 } } },
     ),
   ],
 });

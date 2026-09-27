@@ -11,22 +11,30 @@ module.exports = {
 
   create(context) {
     const rawStatements = /^(raw|whereRaw|joinRaw)$/;
+    const configuredName =
+      context.settings &&
+      context.settings.knex &&
+      context.settings.knex.builderName;
+    let builderNamePattern = configuredName;
+
+    if (typeof configuredName === "string") {
+      try {
+        builderNamePattern = new RegExp(configuredName);
+      } catch (error) {
+        // An invalid pattern should not prevent linting other queries.
+        builderNamePattern = null;
+      }
+    }
 
     return {
       [`CallExpression[callee.property.name=${rawStatements}][arguments.0.type!='Literal']`](
         node,
       ) {
-        if (context.settings && context.settings.knex) {
+        if (builderNamePattern instanceof RegExp) {
           const builder = node.callee.object;
           const builderName = builder.name || builder.callee.name;
-          const { builderName: builderNamePattern } = context.settings.knex;
 
-          if (
-            builderNamePattern instanceof RegExp &&
-            !builderNamePattern.test(builderName)
-          ) {
-            return;
-          }
+          if (!builderNamePattern.test(builderName)) return;
         }
 
         check(context, node);
